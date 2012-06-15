@@ -69,7 +69,7 @@ func LineAndPos(src string, pos int) (int, int) {
 }
 
 // Typ = 0 ignore
-// Typ = -int means don't push repeating occurences of tokens, so a b b b c becomes a b c.
+// Typ = -int means don't push subsequent repeating occurences of a token, so a b b b c becomes a b c.
 func Lex(src string, tokens []TokenExpr) ([]Token, error) {
 	pos := 0
     toks := []Token{}
