@@ -68,6 +68,8 @@ func LineAndPos(src string, pos int) (int, int) {
 	return lines, p
 }
 
+// Typ = 0 ignore
+// Typ = -int means don't push repeating occurences of tokens, so a b b b c becomes a b c.
 func Lex(src string, tokens []TokenExpr) ([]Token, error) {
 	pos := 0
     toks := []Token{}
@@ -90,7 +92,7 @@ func Lex(src string, tokens []TokenExpr) ([]Token, error) {
 			if found != nil {
 				match = true
 				l = found[1]-found[0]
-				if tag != 0 {
+				if tag != 0 && (tag > 0 || len(toks) == 0 || toks[len(toks)-1].Typ != tag) {	// If tag is negative, then avoid repeating occurences and push only once.
 					tok := Token{rem_src[found[0]:found[1]], tag, found[0]}
 					toks = append(toks, tok)
 				}
