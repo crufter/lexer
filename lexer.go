@@ -14,6 +14,7 @@ type TokenExpr struct {
 type Token struct {
 	Text	string
 	Typ		int
+	Occ		int
 	Start	int
 }
 
@@ -70,6 +71,8 @@ func LineAndPos(src string, pos int) (int, int) {
 
 // Typ = 0 ignore
 // Typ = -int means don't push subsequent repeating occurences of a token, so a b b b c becomes a b c.
+// Token.Occ will contain how many times did it occur subsequently.
+// (This allows for example to do whitespace significant lexing.)
 func Lex(src string, tokens []TokenExpr) ([]Token, error) {
 	pos := 0
     toks := []Token{}
@@ -92,9 +95,17 @@ func Lex(src string, tokens []TokenExpr) ([]Token, error) {
 			if found != nil {
 				match = true
 				l = found[1]-found[0]
-				if tag != 0 && (tag > 0 || len(toks) == 0 || toks[len(toks)-1].Typ != tag) {	// If tag is negative, then avoid repeating occurences and push only once.
-					tok := Token{rem_src[found[0]:found[1]], tag, found[0]}
+				if tag > 0 {
+					tok := Token{rem_src[found[0]:found[1]], tag, 0, found[0]}
 					toks = append(toks, tok)
+				}
+				if tag < 0 {	// If tag is negative, then avoid repeating occurences and push only once.
+					if len(toks) == 0 || toks[len(toks)-1].Typ != tag {		// If the previous token is not the same type as the current, then push.
+						tok := Token{rem_src[found[0]:found[1]], 1, tag, found[0]}
+						toks = append(toks, tok)
+					} else {	// If its the same type, increase the occurence counter of the already pushed one.
+						toks[len(toks)-1].Occ++
+					}
 				}
 				break
 			}
