@@ -101,7 +101,7 @@ func Lex(src string, tokens []TokenExpr) ([]Token, error) {
 				}
 				if tag < 0 {	// If tag is negative, then avoid repeating occurences and push only once.
 					if len(toks) == 0 || toks[len(toks)-1].Typ != tag {		// If the previous token is not the same type as the current, then push.
-						tok := Token{rem_src[found[0]:found[1]], 1, tag, found[0]}
+						tok := Token{rem_src[found[0]:found[1]], tag, 1, found[0]}
 						toks = append(toks, tok)
 					} else {	// If its the same type, increase the occurence counter of the already pushed one.
 						toks[len(toks)-1].Occ++
